@@ -5,11 +5,24 @@ const Product = require("../models/product");
 
 router.get("/", (req, res, next) => {
     Product.find()
+        .select("name price _id")
         .exec()
         .then((docs) => {
             console.log(docs);
-            if (docs.length >= 0) {
-                res.status(200).json(docs);
+            const docsLength = docs.length;
+            if (docsLength >= 0) {
+                res.status(200).json({
+                    count: docsLength,
+                    products: docs.map((item) => {
+                        return {
+                            ...item._doc,
+                            request: {
+                                type: "GET",
+                                api: "http://localhost:3000/products/" + item._id,
+                            },
+                        };
+                    }),
+                });
             } else {
                 res.status(404).json({ message: "No entries found" });
             }

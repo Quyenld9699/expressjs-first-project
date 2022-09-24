@@ -8,6 +8,7 @@ const productRoutes = require("./api/routes/products");
 const orderRoutes = require("./api/routes/orders");
 
 mongoose.connect(`mongodb+srv://quyenld9699:${process.env.DB_PASSWORD}@expressjs-db.uyl3y8e.mongodb.net/?retryWrites=true&w=majority`);
+mongoose.Promise = global.Promise;
 
 app.use(morgan("dev"));
 app.use(bodyParser.urlencoded({ extended: false }));
