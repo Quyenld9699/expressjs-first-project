@@ -56,3 +56,64 @@ router.get("/", (req, res, next) => {
         });
 });
 ```
+
+## Mapping data when query
+
+```js
+Order.find().select("product quantity _id").populate("product", "name _id").exec().then().catch();
+```
+
+## Upload images
+
+```js
+// in products.js router
+const multer = require("multer");
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, "./uploads/");
+    },
+    filename: function (req, file, cb) {
+        cb(null, new Date().getMilliseconds() + file.originalname);
+    },
+});
+
+const upload = multer({
+    storage: storage,
+    limits: {
+        fieldSize: 1024 * 1024 * 5,
+    },
+    fileFilter: (req, file, cb) => {
+        if (file.mimetype === "image/jpeg" || file.mimetype === "image/png") {
+            cb(null, true);
+        } else {
+            cb(null, false);
+        }
+    },
+});
+
+router.post("/", upload.single("productImg"), (req, res, next) => {
+    const product = new Product({
+        _id: new mongoose.Types.ObjectId(),
+        name: req.body.name,
+        price: req.body.price,
+        img: req.file.path,
+    });
+
+    product
+        .save()
+        .then((result) => {
+            console.log(result);
+            res.status(201).json({
+                msg: "handling post request to /products",
+                product: product,
+            });
+        })
+        .catch((err) => {
+            console.log(err);
+            res.status(500).json({ error: err });
+        });
+});
+
+// in app.js
+app.use("/uploads", express.static("uploads"));
+```
