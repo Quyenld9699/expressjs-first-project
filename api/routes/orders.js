@@ -1,37 +1,99 @@
+const { request } = require("express");
 const express = require("express");
 const router = express.Router();
+const mongoose = require("mongoose");
+const Order = require("../models/order");
+const Product = require("../models/product");
 
 router.get("/", (req, res, next) => {
-    res.status(200).json({
-        msg: "Orders were fetch",
-    });
+    Order.find()
+        .select("product quantity _id")
+        .populate("product", "name _id")
+        .exec()
+        .then((docs) => {
+            res.status(200).json({
+                count: docs.length,
+                orders: docs.map((order) => {
+                    return {
+                        ...order._doc,
+                        request: {
+                            type: "GET",
+                            url: "http://localhost:3000/orders/" + order._id,
+                        },
+                    };
+                }),
+            });
+        })
+        .catch((err) => {
+            res.status(500).json({ error: err });
+        });
 });
 
 router.post("/", (req, res, next) => {
-    res.status(200).json({
-        msg: "Order post",
-    });
+    Product.findById(req.body.productId)
+        .then((product) => {
+            if (!product) {
+                return res.status(404).json({ message: "Product not found" });
+            }
+            const order = new Order({
+                _id: mongoose.Types.ObjectId(),
+                quantity: req.body.quantity,
+                product: req.body.productId,
+            });
+            return order
+                .save()
+                .then((result) => {
+                    console.log(result);
+                    res.status(201).json(result);
+                })
+                .catch((err) => {
+                    console.log(err);
+                    res.status(500).json({ error: err });
+                });
+        })
+        .catch((err) => {
+            console.log(err);
+            res.status(500).json({ error: err });
+        });
 });
 
-router.get("/:order Id", (req, res, next) => {
-    const id = req.params.productId;
-    if (id === "special") {
-        res.status(200).json({
-            msg: "You discorvered the special ID",
+router.get("/:orderId", (req, res, next) => {
+    const id = req.params.orderId;
+    Order.findById(id)
+        .exec()
+        .then((order) => {
+            res.status(200).json({
+                order: order,
+                request: {
+                    type: "GET",
+                    url: "http://localhost:3000/orders/" + order._id,
+                },
+            });
+        })
+        .catch((err) => {
+            res.status(500).json({ error: err });
         });
-    } else {
-        res.status(200).json({
-            msg: "You passed an ID",
-        });
-    }
 });
 
-router.patch("/:productId", (req, res, next) => {
-    const id = req.params.productId;
+router.patch("/:orderId", (req, res, next) => {
+    const id = req.params.orderId;
 
-    res.status(200).json({
-        msg: "You update product",
-    });
+    Order.remove({ _id: id })
+        .exec()
+        .then((result) => {
+            res.status(200).json({
+                message: "Delete success",
+                request: {
+                    type: "POST",
+                    url: "http://localhost:3000/orders",
+                    body: { productId: "ID", quantity: "Number" },
+                },
+            });
+        })
+        .catch((err) => {
+            console.log(err);
+            res.status(500).json({ error: err });
+        });
 });
 
 module.exports = router;

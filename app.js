@@ -11,6 +11,7 @@ mongoose.connect(`mongodb+srv://quyenld9699:${process.env.DB_PASSWORD}@expressjs
 mongoose.Promise = global.Promise;
 
 app.use(morgan("dev"));
+app.use("/uploads", express.static("uploads"));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
