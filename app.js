@@ -6,6 +6,7 @@ const mongoose = require("mongoose");
 
 const productRoutes = require("./api/routes/products");
 const orderRoutes = require("./api/routes/orders");
+const userRoutes = require("./api/routes/user");
 
 mongoose.connect(`mongodb+srv://quyenld9699:${process.env.DB_PASSWORD}@expressjs-db.uyl3y8e.mongodb.net/?retryWrites=true&w=majority`);
 mongoose.Promise = global.Promise;
@@ -28,7 +29,9 @@ app.use((req, res, next) => {
 // list api
 app.use("/products", productRoutes);
 app.use("/orders", orderRoutes);
+app.use("/user", userRoutes);
 
+// navigate 404
 app.use((req, res, next) => {
     const error = new Error("Not found");
     error.status = 404;
