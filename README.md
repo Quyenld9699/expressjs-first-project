@@ -130,3 +130,5 @@ app.use("/uploads", express.static("uploads"));
     }
 }
 ```
+
+    you must to write check-authentication function check token valid
