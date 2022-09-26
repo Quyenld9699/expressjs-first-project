@@ -117,3 +117,16 @@ router.post("/", upload.single("productImg"), (req, res, next) => {
 // in app.js
 app.use("/uploads", express.static("uploads"));
 ```
+
+## Authentication
+
+    nodemon.json like this:
+
+```json
+{
+    "env": {
+        "DB_PASSWORD": <password mongo>,
+        "JWT_KEY":  <a random string>
+    }
+}
+```
