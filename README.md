@@ -3,7 +3,7 @@
 ```json
 {
     "env": {
-        "DB_PASSWORD": <enter password here>
+        "DB_PASSWORD": <enter password here>   // để tạo mới password chọn Database Access trên sidebar => edit user => edit password
     }
 }
 
