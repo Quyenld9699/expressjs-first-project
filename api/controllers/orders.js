@@ -15,7 +15,7 @@ exports.order_get_all = (req, res, next) => {
                         ...order._doc,
                         request: {
                             type: "GET",
-                            url: "http://localhost:3000/orders/" + order._id,
+                            url: `http://localhost:${process.env.PORT}/orders/` + order._id,
                         },
                     };
                 }),

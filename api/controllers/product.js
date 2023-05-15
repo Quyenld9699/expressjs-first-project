@@ -1,7 +1,9 @@
 const mongoose = require("mongoose");
 const Product = require("../models/product");
+const { counter } = require("./metric");
 
 exports.product_get_all = (req, res, next) => {
+    counter.inc();
     Product.find()
         .select("name price _id img")
         .exec()
@@ -16,7 +18,7 @@ exports.product_get_all = (req, res, next) => {
                             ...item._doc,
                             request: {
                                 type: "GET",
-                                api: "http://localhost:3000/products/" + item._id,
+                                api: `http://localhost:${process.env.PORT}/products/` + item._id,
                             },
                         };
                     }),
@@ -38,6 +40,7 @@ exports.product_create = (req, res, next) => {
         price: req.body.price,
         img: req.file.path,
     });
+    counter.inc();
 
     product
         .save()
